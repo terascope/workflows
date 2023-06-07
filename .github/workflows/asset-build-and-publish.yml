@@ -17,8 +17,7 @@ jobs:
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in test-asset.yml
-        # should this target explicit Node versions?
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [14.21.3, 16.19.1, 18.16.0]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -50,7 +49,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           # NOTE: Hard Coded Node Version
-          node-version: '18.x'
+          node-version: '18.16.0'
           registry-url: 'https://registry.npmjs.org'
       - run: yarn setup
       - run: ./scripts/publish.sh
