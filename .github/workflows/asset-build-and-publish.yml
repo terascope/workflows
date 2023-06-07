@@ -10,8 +10,6 @@ name: Build and Publish Teraslice Asset
 run-name: ${{ github.actor }} is building and publishing the Teraslice Asset
 on:
   workflow_call:
-  release:
-    types: [published]
 
 jobs:
   asset-build:
