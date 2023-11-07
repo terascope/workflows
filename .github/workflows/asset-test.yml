@@ -40,6 +40,11 @@ jobs:
         with:
           # NOTE: Hard Coded Node Version
           node-version: '18.16.1'
+      # TODO: try default python again in the future 
+      - name: Use Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
       - run: yarn setup
       - run: yarn lint
       # TODO: Ideally we'd be able to at least run unit tests that don't require docker.
