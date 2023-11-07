@@ -40,6 +40,7 @@ jobs:
         with:
           # NOTE: Hard Coded Node Version
           node-version: '18.16.1'
+      # NOTE: Prevent python 3.12 breaking node-gyp installations in the kafka asset
       # TODO: try default python again in the future 
       - name: Use Python 3.11
         uses: actions/setup-python@v4
