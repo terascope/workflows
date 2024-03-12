@@ -26,7 +26,7 @@ jobs:
       - run: yarn setup
       - run: yarn lint
       - run: yarn test:all
-      - run: yarn global add teraslice-cli
+      - run: yarn global add teraslice-cli@0.62.0
       - run: teraslice-cli -v
       - run: teraslice-cli assets build
       - run: ls -l build/
@@ -50,7 +50,7 @@ jobs:
       - run: yarn lint
       # TODO: Ideally we'd be able to at least run unit tests that don't require docker.
       #- run: yarn test:all
-      - run: yarn global add teraslice-cli
+      - run: yarn global add teraslice-cli@0.62.0
       - run: teraslice-cli -v
       - run: teraslice-cli assets build
       - run: ls -l build/
