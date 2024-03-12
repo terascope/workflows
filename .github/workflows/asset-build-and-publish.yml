@@ -26,7 +26,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: yarn setup
       - run: yarn build
-      - run: yarn global add teraslice-cli
+      - run: yarn global add teraslice-cli@0.62.0
       - run: teraslice-cli -v
       - run: teraslice-cli assets build
       - run: ls -l ./build/
