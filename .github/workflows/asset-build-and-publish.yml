@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in test-asset.yml
-        node-version: [18.19.1, 20.11.1]
+        node-version: [18.19.1, 20.11.1, 22.2.0]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
