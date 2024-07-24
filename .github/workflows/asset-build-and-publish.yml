@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in test-asset.yml
-        node-version: [18.19.1, 20.11.1, 22.2.0]
+        node-version: [18, 20, 22]
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
@@ -49,7 +49,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           # NOTE: Hard Coded Node Version
-          node-version: '18.19.1'
+          node-version: '18'
           registry-url: 'https://registry.npmjs.org'
       - run: yarn setup
       - run: ./scripts/publish.sh
