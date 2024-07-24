@@ -25,6 +25,16 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - run: yarn setup
       - run: yarn lint
+      - name: Create Docker Image List
+        run: |
+          yarn docker:listImages
+          cat ./images/image-list.txt
+      - name: Restore Docker image cache
+        id: docker-cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/docker_cache
+          key: docker-images-${{ hashFiles('./images/image-list.txt') }}
       - run: yarn test:all
       - run: yarn global add teraslice-cli
       - run: teraslice-cli -v
