@@ -19,9 +19,9 @@ jobs:
         # NOTE: Hard Coded Node Version array, should match array in test-asset.yml
         node-version: [18.19.1, 20.11.1, 22.2.0]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - run: yarn setup
@@ -32,7 +32,7 @@ jobs:
       - run: ls -l ./build/
       - run: sha256sum ./build/*
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: teraslice-asset
           path: ./build
@@ -45,8 +45,8 @@ jobs:
       contents: write
     needs: asset-build
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           # NOTE: Hard Coded Node Version
           node-version: '18.19.1'
@@ -56,12 +56,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Download assets from Teraslice Asset Build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: teraslice-asset
           path: ./build/
       - run: ls -l ./build/
       - name: Upload Assets to Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: ./build/*.zip
