@@ -42,7 +42,7 @@ jobs:
         yarn docker:listImages
         cat ./images/image-list.txt
 
-    - name: Restore Docker image cache
+    - name: Check for Docker image cache
       id: docker-cache
       uses: actions/cache@v4
       with:
@@ -50,7 +50,7 @@ jobs:
         key: docker-images-${{ hashFiles('./images/image-list.txt') }}
         lookup-only: true
 
-    - name: Clear old docker cache
+    - name: Clear old docker cache if present
       if: ${{steps.docker-cache.outputs.cache-hit == 'true'}}
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
