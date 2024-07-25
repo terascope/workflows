@@ -5,16 +5,9 @@ on:
 
 jobs:
   check-docker-limit-before:
-    runs-on: ubuntu-latest
     if: ${{ github.repository != 'terascope/standard-assets' }}
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Check docker.hub limit start
-      env:
-        USER: ${{ secrets.DOCKER_USERNAME }}
-        PASS: ${{ secrets.DOCKER_PASSWORD }}
-      run: yarn docker:limit  
+    uses: ./.github/workflows/check-docker-limit.yml
+    secrets: inherit 
 
   cache-docker-images:
     if: ${{ github.repository != 'terascope/standard-assets' }}
@@ -88,14 +81,6 @@ jobs:
       - run: ls -l build/
 
   check-docker-limit-after:
-    runs-on: ubuntu-latest
-    if: ${{ github.repository != 'terascope/standard-assets' }}
     needs: test-linux
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Check docker.hub limit after
-      env:
-        USER: ${{ secrets.DOCKER_USERNAME }}
-        PASS: ${{ secrets.DOCKER_PASSWORD }}
-      run: yarn docker:limit
+    uses: ./.github/workflows/check-docker-limit.yml
+    secrets: inherit 
