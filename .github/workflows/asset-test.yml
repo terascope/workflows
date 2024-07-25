@@ -4,8 +4,81 @@ on:
   workflow_call:
 
 jobs:
+  check-docker-limit-before:
+    runs-on: ubuntu-latest
+    if: ${{ github.repository != 'terascope/standard-assets' }}
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Check docker.hub limit start
+      env:
+        USER: ${{ secrets.DOCKER_USERNAME }}
+        PASS: ${{ secrets.DOCKER_PASSWORD }}
+      run: yarn docker:limit  
+
+  cache-docker-images:
+    runs-on: ubuntu-latest
+    if: ${{ github.repository != 'terascope/standard-assets' }}
+    needs: check-docker-limit-before
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'yarn'
+
+    # we login to docker to avoid docker pull limit rates
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Check docker.hub limit start of job
+      env:
+        USER: ${{ secrets.DOCKER_USERNAME }}
+        PASS: ${{ secrets.DOCKER_PASSWORD }}
+      run: yarn docker:limit
+
+    - name: Install and build packages
+      run: yarn setup
+
+    - name: Create Docker Image List
+      run: |
+        yarn docker:listImages
+        cat ./images/image-list.txt
+
+    - name: Restore Docker image cache
+      id: docker-cache
+      uses: actions/cache@v4
+      with:
+        path: /tmp/docker_cache
+        key: docker-images-${{ hashFiles('./images/image-list.txt') }}
+        lookup-only: true
+
+    - name: Pull and save Docker images
+      if: ${{steps.docker-cache.outputs.cache-hit != 'true'}}
+      run: yarn docker:saveImages
+
+    - name: Update Docker image cache
+      if: ${{steps.docker-cache.outputs.cache-hit != 'true'}}
+      uses: actions/cache/save@v4
+      with:
+        path: /tmp/docker_cache
+        key: docker-images-${{ hashFiles('./images/image-list.txt') }}
+
+    - name: Check docker.hub limit end of job
+      env:
+        USER: ${{ secrets.DOCKER_USERNAME }}
+        PASS: ${{ secrets.DOCKER_PASSWORD }}
+      run: npm run docker:limit
+
   test-linux:
     runs-on: ubuntu-latest
+    needs: cache-docker-images
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
@@ -19,6 +92,7 @@ jobs:
       # we login to docker to avoid docker pull limit rates
       # secrets are now duplicated for Actions and Dependabot
       - name: Login to Docker Hub
+        if: ${{ github.repository != 'terascope/standard-assets' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -26,11 +100,12 @@ jobs:
       - run: yarn setup
       - run: yarn lint
       - name: Create Docker Image List
+        if: ${{ github.repository != 'terascope/standard-assets' }}
         run: |
           yarn docker:listImages
           cat ./images/image-list.txt
-        continue-on-error: true
       - name: Restore Docker image cache
+        if: ${{ github.repository != 'terascope/standard-assets' }}
         id: docker-cache
         uses: actions/cache@v4
         with:
@@ -44,6 +119,7 @@ jobs:
 
   test-macos:
     runs-on: macos-latest
+    if: ${{ github.repository != 'terascope/standard-assets' }}
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
@@ -65,3 +141,15 @@ jobs:
       - run: teraslice-cli -v
       - run: teraslice-cli assets build
       - run: ls -l build/
+
+  check-docker-limit-after:
+    runs-on: ubuntu-latest
+    needs: test-linux
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Check docker.hub limit after
+      env:
+        USER: ${{ secrets.DOCKER_USERNAME }}
+        PASS: ${{ secrets.DOCKER_PASSWORD }}
+      run: yarn docker:limit
