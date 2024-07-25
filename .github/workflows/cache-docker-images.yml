@@ -1,4 +1,4 @@
-name: Cache Docker Images
+name: Cache Docker Images If No Cache Found
 
 on:
   workflow_call:
@@ -33,7 +33,7 @@ jobs:
         yarn docker:listImages
         cat ./images/image-list.txt
 
-    - name: Restore Docker image cache
+    - name: Check for Docker image cache
       id: docker-cache
       uses: actions/cache@v4
       with:
@@ -41,11 +41,11 @@ jobs:
         key: docker-images-${{ hashFiles('./images/image-list.txt') }}
         lookup-only: true
 
-    - name: Pull and save Docker images
+    - name: Pull and save Docker images if no cache hit
       if: ${{steps.docker-cache.outputs.cache-hit != 'true'}}
       run: yarn docker:saveImages
 
-    - name: Update Docker image cache
+    - name: Update Docker image cache if no cache hit
       if: ${{steps.docker-cache.outputs.cache-hit != 'true'}}
       uses: actions/cache/save@v4
       with:
