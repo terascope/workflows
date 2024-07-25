@@ -4,12 +4,12 @@ on:
   workflow_call:
 
 jobs:
-  check-docker-limit-before:
+  check-docker-pull-rate-limit:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - name: Check docker.hub limit start
+    - name: Check docker.hub pull limit
       env:
         USER: ${{ secrets.DOCKER_USERNAME }}
         PASS: ${{ secrets.DOCKER_PASSWORD }}
