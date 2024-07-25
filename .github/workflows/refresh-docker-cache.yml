@@ -85,4 +85,4 @@ jobs:
       env:
         USER: ${{ secrets.DOCKER_USERNAME }}
         PASS: ${{ secrets.DOCKER_PASSWORD }}
-      run: npm run docker:limit
+      run: yarn run docker:limit
