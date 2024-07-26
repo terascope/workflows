@@ -32,7 +32,7 @@ jobs:
       id: image-list
       run: |
         yarn docker:listImages
-        echo "LIST_CONTENTS=$( cat ./images/image-list.txt )" >> $GITHUB_OUTPUT 
+        cat ./images/image-list.txt
 
     - name: Check for Docker image cache
       id: docker-cache
@@ -47,7 +47,7 @@ jobs:
       run: yarn docker:saveImages
 
     - name: Update Docker image cache if no cache hit
-      if: ${{steps.docker-cache.outputs.cache-hit != 'true'}} && ${{steps.image-list.outputs.LIST_CONTENTS != ''}}
+      if: ${{steps.docker-cache.outputs.cache-hit != 'true'}}
       uses: actions/cache/save@v4
       with:
         path: /tmp/docker_cache
