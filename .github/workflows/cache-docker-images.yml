@@ -29,9 +29,10 @@ jobs:
         YARN_SETUP_ARGS: "--prod=false --silent"
 
     - name: Create Docker Image List
+      id: image-list
       run: |
         yarn docker:listImages
-        cat ./images/image-list.txt
+        echo "LIST_CONTENTS=$( cat ./images/image-list.txt )" >> $GITHUB_OUTPUT 
 
     - name: Check for Docker image cache
       id: docker-cache
@@ -46,7 +47,7 @@ jobs:
       run: yarn docker:saveImages
 
     - name: Update Docker image cache if no cache hit
-      if: ${{steps.docker-cache.outputs.cache-hit != 'true'}}
+      if: ${{steps.docker-cache.outputs.cache-hit != 'true'}} && ${{steps.image-list.outputs.LIST_CONTENTS != ''}}
       uses: actions/cache/save@v4
       with:
         path: /tmp/docker_cache
