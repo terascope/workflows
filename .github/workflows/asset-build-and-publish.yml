@@ -34,7 +34,7 @@ jobs:
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: teraslice-asset
+          name: teraslice-asset-${{ matrix.node-version }}
           path: ./build
 
   # Asset Upload and NPM Publish should be done only after builds from all Node
@@ -58,8 +58,9 @@ jobs:
       - name: Download assets from Teraslice Asset Build
         uses: actions/download-artifact@v4
         with:
-          name: teraslice-asset
           path: ./build/
+          pattern: teraslice-asset-*
+          merge-multiple: true
       - run: ls -l ./build/
       - name: Upload Assets to Release
         uses: softprops/action-gh-release@v2
