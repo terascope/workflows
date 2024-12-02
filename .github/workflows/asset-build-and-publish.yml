@@ -28,6 +28,9 @@ jobs:
       - run: yarn build
       - name: Ensure jq is installed
         run: sudo apt-get update && sudo apt-get install -y jq
+
+      # This step is a temporary fix for a bug in point-in-polygon-hao
+      # We are adding a yarn global resolution to pin it at v1.1.0
       - name: Locate and Add Resolution to Global Package.json
         run: |
           GLOBAL_PACKAGE_DIR=$(yarn global dir)
@@ -35,9 +38,7 @@ jobs:
           echo "export PATH=$(yarn global bin):\$PATH" >> $GITHUB_ENV
           yarn global add dummy-package
           PACKAGE_JSON="$GLOBAL_PACKAGE_DIR/package.json"
-          echo "Updating $PACKAGE_JSON"
           jq '.resolutions["point-in-polygon-hao"] = "1.1.0"' $PACKAGE_JSON > /tmp/pkg.json && mv /tmp/pkg.json $PACKAGE_JSON
-          cat $PACKAGE_JSON
       - run: yarn global add teraslice-cli
       - run: teraslice-cli -v
       - run: teraslice-cli assets build
