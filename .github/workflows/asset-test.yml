@@ -52,6 +52,7 @@ jobs:
         run: |
           GLOBAL_PACKAGE_DIR=$(yarn global dir)
           PACKAGE_JSON="$GLOBAL_PACKAGE_DIR/package.json"
+          cat $PACKAGE_JSON
           echo "Updating $PACKAGE_JSON"
           jq '.resolutions["point-in-polygon-hao"] = "1.1.0"' $PACKAGE_JSON > tmp.json && mv tmp.json $PACKAGE_JSON
           cat $PACKAGE_JSON
@@ -85,6 +86,7 @@ jobs:
         run: |
           GLOBAL_PACKAGE_DIR=$(yarn global dir)
           PACKAGE_JSON="$GLOBAL_PACKAGE_DIR/package.json"
+          cat $PACKAGE_JSON
           echo "Updating $PACKAGE_JSON"
           jq '.resolutions["point-in-polygon-hao"] = "1.1.0"' $PACKAGE_JSON > tmp.json && mv tmp.json $PACKAGE_JSON
           cat $PACKAGE_JSON
