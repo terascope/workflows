@@ -26,8 +26,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: yarn setup
       - run: yarn build
-      - name: Ensure jq is installed
-        run: sudo apt-get update && sudo apt-get install -y jq
 
       # This step is a temporary fix for a bug in point-in-polygon-hao
       # We are adding a yarn global resolution to pin it at v1.1.0
