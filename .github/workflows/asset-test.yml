@@ -53,7 +53,7 @@ jobs:
           GLOBAL_PACKAGE_DIR=$(yarn global dir)
           mkdir -p "$GLOBAL_PACKAGE_DIR"
           echo "export PATH=$(yarn global bin):\$PATH" >> $GITHUB_ENV
-          run: yarn global add dummy-package
+          yarn global add dummy-package
           PACKAGE_JSON="$GLOBAL_PACKAGE_DIR/package.json"
           echo "Updating $PACKAGE_JSON"
           jq '.resolutions["point-in-polygon-hao"] = "1.1.0"' $PACKAGE_JSON > /tmp/pkg.json && mv /tmp/pkg.json $PACKAGE_JSON
@@ -87,10 +87,12 @@ jobs:
       - name: Locate and Add Resolution to Global Package.json
         run: |
           GLOBAL_PACKAGE_DIR=$(yarn global dir)
+          mkdir -p "$GLOBAL_PACKAGE_DIR"
+          echo "export PATH=$(yarn global bin):\$PATH" >> $GITHUB_ENV
+          yarn global add dummy-package
           PACKAGE_JSON="$GLOBAL_PACKAGE_DIR/package.json"
-          cat $PACKAGE_JSON
           echo "Updating $PACKAGE_JSON"
-          jq '.resolutions["point-in-polygon-hao"] = "1.1.0"' $PACKAGE_JSON > tmp.json && mv tmp.json $PACKAGE_JSON
+          jq '.resolutions["point-in-polygon-hao"] = "1.1.0"' $PACKAGE_JSON > /tmp/pkg.json && mv /tmp/pkg.json $PACKAGE_JSON
           cat $PACKAGE_JSON
       - run: yarn global add teraslice-cli
       - run: teraslice-cli -v
