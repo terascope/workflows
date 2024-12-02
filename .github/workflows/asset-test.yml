@@ -46,6 +46,15 @@ jobs:
           path: /tmp/docker_cache
           key: docker-images-${{ hashFiles('./images/image-list.txt') }}
       - run: yarn test:all
+      - name: Ensure jq is installed
+        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Locate and Add Resolution to Global Package.json
+        run: |
+          GLOBAL_PACKAGE_DIR=$(yarn global dir)
+          PACKAGE_JSON="$GLOBAL_PACKAGE_DIR/package.json"
+          echo "Updating $PACKAGE_JSON"
+          jq '.resolutions["point-in-polygon-hao"] = "1.1.0"' $PACKAGE_JSON > tmp.json && mv tmp.json $PACKAGE_JSON
+          cat $PACKAGE_JSON
       - run: yarn global add teraslice-cli
       - run: teraslice-cli -v
       - run: teraslice-cli assets build
@@ -70,6 +79,15 @@ jobs:
       - run: yarn lint
       # TODO: Ideally we'd be able to at least run unit tests that don't require docker.
       #- run: yarn test:all
+      - name: Ensure jq is installed
+        run: brew install jq
+      - name: Locate and Add Resolution to Global Package.json
+        run: |
+          GLOBAL_PACKAGE_DIR=$(yarn global dir)
+          PACKAGE_JSON="$GLOBAL_PACKAGE_DIR/package.json"
+          echo "Updating $PACKAGE_JSON"
+          jq '.resolutions["point-in-polygon-hao"] = "1.1.0"' $PACKAGE_JSON > tmp.json && mv tmp.json $PACKAGE_JSON
+          cat $PACKAGE_JSON
       - run: yarn global add teraslice-cli
       - run: teraslice-cli -v
       - run: teraslice-cli assets build
