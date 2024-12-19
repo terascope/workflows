@@ -28,6 +28,7 @@ jobs:
         run: |
           corepack enable
           corepack prepare yarn@4.5.3 --activate
+          yarn install
       - run: yarn setup
       - run: yarn build
       - run: yarn global add teraslice-cli
@@ -59,6 +60,7 @@ jobs:
         run: |
           corepack enable
           corepack prepare yarn@4.5.3 --activate
+          yarn install
       - run: yarn setup
       - run: ./scripts/publish.sh
         env:

@@ -31,6 +31,7 @@ jobs:
         run: |
           corepack enable
           corepack prepare yarn@4.5.3 --activate
+          yarn install
       # we login to docker to avoid docker pull limit rates
       # secrets are now duplicated for Actions and Dependabot
       - name: Login to Docker Hub

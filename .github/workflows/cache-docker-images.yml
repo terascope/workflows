@@ -20,6 +20,7 @@ jobs:
       run: |
         corepack enable
         corepack prepare yarn@4.5.3 --activate
+        yarn install
    
 
     # we login to docker to avoid docker pull limit rates
