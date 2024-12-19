@@ -24,6 +24,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Install Yarn 4
+        run: |
+          corepack enable
+          corepack prepare yarn@4.5.3 --activate
       - run: yarn setup
       - run: yarn build
       - run: yarn global add teraslice-cli
@@ -51,6 +55,10 @@ jobs:
           # NOTE: Hard Coded Node Version
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
+      - name: Install Yarn 4
+        run: |
+          corepack enable
+          corepack prepare yarn@4.5.3 --activate
       - run: yarn setup
       - run: ./scripts/publish.sh
         env:
