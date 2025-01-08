@@ -24,11 +24,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - run: yarn setup
+      - run: yarn && yarn setup
       - run: yarn build
-      - run: yarn global add teraslice-cli
-      - run: teraslice-cli -v
-      - run: teraslice-cli assets build
+      - run: yarn dlx teraslice-cli -v
+      - run: yarn dlx teraslice-cli assets build
       - run: ls -l ./build/
       - run: sha256sum ./build/*
       - name: Archive production artifacts
@@ -51,7 +50,7 @@ jobs:
           # NOTE: Hard Coded Node Version
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
-      - run: yarn setup
+      - run: yarn && yarn setup
       - run: ./scripts/publish.sh
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

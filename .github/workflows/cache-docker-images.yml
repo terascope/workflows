@@ -24,9 +24,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Install and build packages
-      run: yarn setup
-      env:
-        YARN_SETUP_ARGS: "--prod=false --silent"
+      run: yarn && yarn setup
 
     - name: Create Docker Image List
       id: image-list
