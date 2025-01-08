@@ -12,4 +12,4 @@ jobs:
       env:
         USER: ${{ secrets.DOCKER_USERNAME }}
         PASS: ${{ secrets.DOCKER_PASSWORD }}
-      run: yarn docker:limit
+      run: yarn && yarn docker:limit
