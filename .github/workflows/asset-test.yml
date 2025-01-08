@@ -26,12 +26,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      # Install yarn 4
-      - name: Install Yarn 4
-        run: |
-          corepack enable
-          corepack prepare yarn@4.6.0 --activate
-          yarn install
       # we login to docker to avoid docker pull limit rates
       # secrets are now duplicated for Actions and Dependabot
       - name: Login to Docker Hub
@@ -65,12 +59,6 @@ jobs:
         with:
           # NOTE: Hard Coded Node Version
           node-version: '18'
-      # Install yarn 4
-      - name: Install Yarn 4
-        run: |
-          corepack enable
-          corepack prepare yarn@4.6.0 --activate
-          yarn install
       # NOTE: Prevent python 3.12 breaking node-gyp installations in the kafka asset
       # TODO: try default python again in the future 
       - name: Use Python 3.11

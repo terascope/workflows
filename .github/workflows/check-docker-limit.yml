@@ -8,13 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-
-    - name: Install Yarn 4
-      run: |
-        corepack enable
-        corepack prepare yarn@4.6.0 --activate
-        yarn install
-
     - name: Check docker.hub pull limit
       env:
         USER: ${{ secrets.DOCKER_USERNAME }}
