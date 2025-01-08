@@ -26,11 +26,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-
+      # Install yarn 4
       - name: Install Yarn 4
         run: |
           corepack enable
-          corepack prepare yarn@4.5.3 --activate
+          corepack prepare yarn@4.6.0 --activate
           yarn install
       # we login to docker to avoid docker pull limit rates
       # secrets are now duplicated for Actions and Dependabot
@@ -39,7 +39,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - run: yarn setup
+      - run: yarn && yarn setup
       - run: yarn lint
       - name: Create Docker Image List
         run: |
@@ -52,9 +52,8 @@ jobs:
           path: /tmp/docker_cache
           key: docker-images-${{ hashFiles('./images/image-list.txt') }}
       - run: yarn test:all
-      - run: yarn global add teraslice-cli
-      - run: teraslice-cli -v
-      - run: teraslice-cli assets build
+      - run: yarn dlx teraslice-cli -v
+      - run: yarn dlx teraslice-cli assets build
       - run: ls -l build/
 
   test-macos:
@@ -66,19 +65,24 @@ jobs:
         with:
           # NOTE: Hard Coded Node Version
           node-version: '18'
+      # Install yarn 4
+      - name: Install Yarn 4
+        run: |
+          corepack enable
+          corepack prepare yarn@4.6.0 --activate
+          yarn install
       # NOTE: Prevent python 3.12 breaking node-gyp installations in the kafka asset
       # TODO: try default python again in the future 
       - name: Use Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: yarn setup
+      - run: yarn && yarn setup
       - run: yarn lint
       # TODO: Ideally we'd be able to at least run unit tests that don't require docker.
       #- run: yarn test:all
-      - run: yarn global add teraslice-cli
-      - run: teraslice-cli -v
-      - run: teraslice-cli assets build
+      - run: yarn dlx teraslice-cli -v
+      - run: yarn dlx teraslice-cli assets build
       - run: ls -l build/
 
   check-docker-limit-after:

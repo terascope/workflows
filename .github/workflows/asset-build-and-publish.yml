@@ -27,13 +27,12 @@ jobs:
       - name: Install Yarn 4
         run: |
           corepack enable
-          corepack prepare yarn@4.5.3 --activate
+          corepack prepare yarn@4.6.0 --activate
           yarn install
-      - run: yarn setup
+      - run: yarn && yarn setup
       - run: yarn build
-      - run: yarn global add teraslice-cli
-      - run: teraslice-cli -v
-      - run: teraslice-cli assets build
+      - run: yarn dlx teraslice-cli -v
+      - run: yarn dlx teraslice-cli assets build
       - run: ls -l ./build/
       - run: sha256sum ./build/*
       - name: Archive production artifacts
@@ -59,9 +58,9 @@ jobs:
       - name: Install Yarn 4
         run: |
           corepack enable
-          corepack prepare yarn@4.5.3 --activate
+          corepack prepare yarn@4.6.0 --activate
           yarn install
-      - run: yarn setup
+      - run: yarn && yarn setup
       - run: ./scripts/publish.sh
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
