@@ -49,10 +49,10 @@ jobs:
       - run: yarn dlx teraslice-cli -v
       - run: yarn dlx teraslice-cli assets build
       - run: ls -l build/
-      - name:  Archive build artifacts
+      - name:  Archive test build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: teraslice-asset-${{ matrix.node-version }}
+          name: teraslice-test-asset-${{ matrix.node-version }}
           path: ./build
           retention-days: 7
 
