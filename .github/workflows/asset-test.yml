@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: 
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
@@ -89,6 +89,40 @@ jobs:
       - run: yarn dlx teraslice-cli -v
       - run: yarn dlx teraslice-cli assets build
       - run: ls -l build/
+
+  comment-artifact-urls:
+    # skip comment on push event (merge to master)
+    # i f: github.event_name != 'push'
+    needs: [test-linux, test-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Identify trigger source
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "PR source branch: ${{ github.head_ref }}"
+
+      - name: Get Artifacts List
+        id: artifacts-list
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ARTIFACTS_JSON=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)
+          echo $ARTIFACTS_JSON
+          URL_LIST=$(echo "$ARTIFACTS_JSON" | jq -c  '[.artifacts[] | {name: .name, url:.archive_download_url}]')
+          echo $URL_LIST
+          echo "artifact-urls=$URL_LIST" >> "$GITHUB_OUTPUT"
+          
+      - name: Comment on PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          ARTIFACT_URLS='${{ steps.artifacts-list.outputs.artifact-urls }}'
+          LIST=$(echo "$ARTIFACT_URLS" | jq -r '.[] | "\(.name): \(.url)"')
+          COMMENT=$(printf "Asset artifacts:\n%s" "$LIST")
+          gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments -f body="$COMMENT"
+
 
   check-docker-limit-after:
     needs: test-linux
