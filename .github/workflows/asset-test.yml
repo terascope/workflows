@@ -92,16 +92,10 @@ jobs:
 
   comment-artifact-urls:
     # skip comment on push event (merge to master)
-    # i f: github.event_name != 'push'
+    if: github.event_name != 'push'
     needs: [test-linux, test-macos]
     runs-on: ubuntu-latest
     steps:
-      - name: Identify trigger source
-        run: |
-          echo "Event: ${{ github.event_name }}"
-          echo "Branch: ${{ github.ref }}"
-          echo "PR source branch: ${{ github.head_ref }}"
-
       - name: Get Artifacts List
         id: artifacts-list
         env:
