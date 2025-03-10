@@ -89,8 +89,8 @@ jobs:
       - run: ls -l build/
 
   comment-artifact-urls:
-    # skip comment on push event (merge to master)
-    if: github.event_name != 'push'
+    # skip comment on push event (merge to master) and dependabot PRs
+    if: github.event_name != 'push' && github.actor != 'dependabot[bot]'
     needs: [test-linux, test-macos]
     runs-on: ubuntu-latest
     steps:
