@@ -1,0 +1,43 @@
+name: Cache Asset Bundles If No Cache Found
+
+on:
+  workflow_call:
+
+jobs:
+  cache-asset-bundles:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'yarn'
+
+    - name: Install and build packages
+      run: yarn && yarn setup
+
+    - name: Build e2e directory
+      run: cd ./e2e && yarn build
+
+    - name: Check for asset bundle cache
+      id: asset-bundles-cache
+      uses: actions/cache@v4
+      with:
+        path: /tmp/teraslice_assets
+        # Realized this won't work. Need to find better way to hash
+        key: asset-bundles-${{ hashFiles('./e2e/autoload/*.zip') }}
+        lookup-only: true
+
+    - name: Pull and save asset bundles if no cache hit
+      if: ${{steps.asset-bundles-cache.outputs.cache-hit != 'true'}}
+      run: yarn download-assets
+
+    - name: Update asset bundles cache if no cache hit
+      if: ${{steps.asset-bundles-cache.outputs.cache-hit != 'true'}}
+      uses: actions/cache/save@v4
+      with:
+        path: /tmp/teraslice_assets
+        key: asset-bundles-${{ hashFiles('./e2e/autoload/*.zip') }}
