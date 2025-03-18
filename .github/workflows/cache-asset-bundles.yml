@@ -22,22 +22,24 @@ jobs:
     - name: Build e2e directory
       run: cd ./e2e && yarn build
 
+    - name: Generate asset bundle list
+      run: yarn download-assets generate-list
+
     - name: Check for asset bundle cache
       id: asset-bundles-cache
       uses: actions/cache@v4
       with:
         path: /tmp/teraslice_assets
-        # Realized this won't work. Need to find better way to hash
-        key: asset-bundles-${{ hashFiles('./e2e/autoload/*.zip') }}
+        key: asset-bundles-${{ hashFiles('./e2e/scripts/ci_asset_bundle_list.txt') }}
         lookup-only: true
 
     - name: Pull and save asset bundles if no cache hit
       if: ${{steps.asset-bundles-cache.outputs.cache-hit != 'true'}}
-      run: yarn download-assets
+      run: yarn download-assets download
 
     - name: Update asset bundles cache if no cache hit
       if: ${{steps.asset-bundles-cache.outputs.cache-hit != 'true'}}
       uses: actions/cache/save@v4
       with:
         path: /tmp/teraslice_assets
-        key: asset-bundles-${{ hashFiles('./e2e/autoload/*.zip') }}
+        key: asset-bundles-${{ hashFiles('./e2e/scripts/ci_asset_bundle_list.txt') }}

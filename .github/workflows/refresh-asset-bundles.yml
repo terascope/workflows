@@ -26,6 +26,9 @@ jobs:
     - name: Build e2e directory
       run: cd ./e2e && yarn build
 
+    - name: Generate asset bundle list
+      run: yarn download-assets generate-list
+
     - name: Check for asset bundles cache
       id: asset-bundles-cache
       uses: actions/cache@v4
@@ -56,10 +59,10 @@ jobs:
         echo "Done"
 
     - name: Pull and save asset bundles
-      run: yarn download-assets
+      run: yarn download-assets download
 
     - name: Update asset bundle cache
       uses: actions/cache/save@v4
       with:
         path: /tmp/teraslice_assets
-        key: asset-bundles-${{ hashFiles('./images/image-list.txt') }}
+        key: asset-bundles-${{ hashFiles('./e2e/scripts/ci_asset_bundle_list.txt') }}
