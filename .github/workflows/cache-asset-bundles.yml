@@ -40,7 +40,6 @@ jobs:
       run: yarn download-assets download
       working-directory: ./e2e
 
-
     - name: Update asset bundles cache if no cache hit
       if: ${{steps.asset-bundles-cache.outputs.cache-hit != 'true'}}
       uses: actions/cache/save@v4
