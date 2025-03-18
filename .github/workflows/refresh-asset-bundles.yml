@@ -24,10 +24,12 @@ jobs:
       run: yarn && yarn setup
 
     - name: Build e2e directory
-      run: cd ./e2e && yarn build
+      run: yarn build
+      working-directory: ./e2e
 
     - name: Generate asset bundle list
       run: yarn download-assets generate-list
+      working-directory: ./e2e
 
     - name: Check for asset bundles cache
       id: asset-bundles-cache
