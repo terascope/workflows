@@ -38,6 +38,8 @@ jobs:
     - name: Pull and save asset bundles if no cache hit
       if: ${{steps.asset-bundles-cache.outputs.cache-hit != 'true'}}
       run: yarn download-assets download
+      working-directory: ./e2e
+
 
     - name: Update asset bundles cache if no cache hit
       if: ${{steps.asset-bundles-cache.outputs.cache-hit != 'true'}}
