@@ -36,7 +36,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: /tmp/teraslice_assets
-        key: asset-bundles-${{ hashFiles('./images/image-list.txt') }}
+        key: asset-bundles-${{ hashFiles('./e2e/scripts/ci_asset_bundle_list.txt') }}
         lookup-only: true
 
     - name: Clear old docker cache if present
