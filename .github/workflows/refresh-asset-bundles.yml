@@ -1,0 +1,71 @@
+name: Refresh Asset Bundles Cache
+
+on:
+  workflow_call:
+
+jobs:
+  refresh-asset-bundle-cache:
+    runs-on: ubuntu-latest
+
+    # # final check to make sure it runs only on master branch
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'yarn'
+
+    - name: Install and build packages
+      run: yarn && yarn setup
+
+    - name: Build e2e directory
+      run: yarn build
+      working-directory: ./e2e
+
+    - name: Generate asset bundle list
+      run: yarn download-assets generate-list
+      working-directory: ./e2e
+
+    - name: Check for asset bundles cache
+      id: asset-bundles-cache
+      uses: actions/cache@v4
+      with:
+        path: /tmp/teraslice_assets
+        key: asset-bundles-${{ hashFiles('./e2e/scripts/ci_asset_bundle_list.txt') }}
+        lookup-only: true
+
+    - name: Clear old docker cache if present
+      if: ${{steps.asset-bundles-cache.outputs.cache-hit == 'true'}}
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO: ${{ github.repository }}
+        BRANCH: refs/heads/master
+      run: |
+        gh extension install actions/gh-actions-cache
+
+        echo "Fetching list of cache key"
+        cacheKeysForPR=$(gh actions-cache list --key "asset-bundles-" -R $REPO -B $BRANCH -L 100 | cut -f 1 )
+
+        ## Setting this to not fail the workflow while deleting cache keys.
+        set +e
+        echo "Deleting caches..."
+        for cacheKey in $cacheKeysForPR
+        do
+            gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+        done
+        echo "Done"
+
+    - name: Pull and save asset bundles
+      run: yarn download-assets download
+      working-directory: ./e2e
+
+    - name: Update asset bundle cache
+      uses: actions/cache/save@v4
+      with:
+        path: /tmp/teraslice_assets
+        key: asset-bundles-${{ hashFiles('./e2e/scripts/ci_asset_bundle_list.txt') }}
