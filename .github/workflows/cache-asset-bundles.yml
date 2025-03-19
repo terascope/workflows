@@ -46,3 +46,13 @@ jobs:
       with:
         path: /tmp/teraslice_assets
         key: asset-bundles-${{ hashFiles('./e2e/scripts/ci_asset_bundle_list.txt') }}
+
+    - name: Upload asset bundle text file list as artifact
+      uses: actions/upload-artifact@v4
+      id: asset-bundle-list-artifact-upload
+      with:
+        # Must be unique so it can always be found in e2e test runners
+        name: asset-bundle-txt-file-list
+        path: ${{ github.workspace }}/e2e/scripts/ci_asset_bundle_list.txt
+        retention-days: 7
+        overwrite: true
