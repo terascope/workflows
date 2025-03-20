@@ -1,0 +1,11 @@
+name: Check Github API Rate limit
+
+on:
+  workflow_call:
+
+jobs:
+  check-docker-pull-rate-limit:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check Github API rate limit
+      run: curl https://api.github.com/rate_limit
