@@ -10,7 +10,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Check Github API rate limit Unauthorized
-      run: curl https://api.github.com/rate_limit
+      run: curl -Ss https://api.github.com/rate_limit
     - name: Check Github API rate limit Authorized
       run: |
         curl -L \
