@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  check-docker-pull-rate-limit:
+  check-github-api-rate-limit:
     runs-on: ubuntu-latest
     steps:
     - name: Check Github API rate limit
