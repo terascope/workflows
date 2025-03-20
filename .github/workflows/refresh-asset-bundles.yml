@@ -6,6 +6,8 @@ on:
 jobs:
   refresh-asset-bundle-cache:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     # # final check to make sure it runs only on master branch
     if: github.ref == 'refs/heads/master'
