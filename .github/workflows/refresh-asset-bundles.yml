@@ -28,6 +28,8 @@ jobs:
       working-directory: ./e2e
 
     - name: Generate asset bundle list
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: yarn download-assets generate-list
       working-directory: ./e2e
 
@@ -39,7 +41,7 @@ jobs:
         key: asset-bundles-${{ hashFiles('./e2e/scripts/ci_asset_bundle_list.txt') }}
         lookup-only: true
 
-    - name: Clear old docker cache if present
+    - name: Clear old asset bundle cache if present
       if: ${{steps.asset-bundles-cache.outputs.cache-hit == 'true'}}
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -61,6 +63,8 @@ jobs:
         echo "Done"
 
     - name: Pull and save asset bundles
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: yarn download-assets download
       working-directory: ./e2e
 
@@ -69,3 +73,13 @@ jobs:
       with:
         path: /tmp/teraslice_assets
         key: asset-bundles-${{ hashFiles('./e2e/scripts/ci_asset_bundle_list.txt') }}
+
+    - name: Upload asset bundle text file list as artifact
+      uses: actions/upload-artifact@v4
+      id: asset-bundle-list-artifact-upload
+      with:
+        # Must be unique so it can always be found in e2e test runners
+        name: asset-bundle-txt-file-list
+        path: ${{ github.workspace }}/e2e/scripts/ci_asset_bundle_list.txt
+        retention-days: 7
+        overwrite: true
