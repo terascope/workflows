@@ -140,3 +140,58 @@ jobs:
       - name: Failed Announcement Response
         if: ${{ steps.announce-release.outputs.ok == 'false' }}
         run: echo "Slackbot API failure response - ${{ steps.announce-release.outputs.response }}"
+
+  check-for-website:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    outputs:
+      website_exists: ${{ steps.find-directory.outputs.website_exists }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Find website directory
+        id: find-directory
+        run: |
+          if [ -d "./website" ]; then
+            echo "Website exists. Docs will be published."  
+            echo "website_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Website does not exist. Docs will not be published."  
+            echo "website_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+  build-docs:
+    runs-on: ubuntu-latest
+    needs: [version-check, check-for-website]
+    if: needs.version-check.outputs.version_updated == 'true' && needs.check-for-website.outputs.website_exists == 'true'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version:  22
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'yarn'
+
+      - name: Build documentation
+        run: yarn && ./scripts/build-documentation.sh  # output in website/build
+      - name: Check Output
+        run: find ./website/build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./website/build
+
+  publish-docs:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    needs: build-docs
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
