@@ -134,3 +134,9 @@ jobs:
     needs: test-linux
     uses: ./.github/workflows/check-docker-limit.yml
     secrets: inherit 
+
+  all-tests-passed:
+    needs: [test-linux, test-macos, test-website]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "all tests have passed"
