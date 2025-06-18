@@ -97,7 +97,10 @@ jobs:
         with:
           # NOTE: Hard Coded Node Version
           node-version: '22'
-      - run: yarn && ./scripts/build-documentation.sh
+      - name: Build documentation
+        run: yarn && ./scripts/build-documentation.sh
+      - name: Check Output
+        run: find ./website/build
 
   comment-artifact-urls:
     # skip comment on push event (merge to master) and dependabot PRs
