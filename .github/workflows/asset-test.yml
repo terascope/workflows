@@ -88,6 +88,20 @@ jobs:
       - run: yarn dlx teraslice-cli assets build
       - run: ls -l build/
 
+  test-website:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          # NOTE: Hard Coded Node Version
+          node-version: '22'
+      - name: Build documentation
+        run: yarn && ./scripts/build-documentation.sh
+      - name: Check Output
+        run: find ./website/build
+
   comment-artifact-urls:
     # skip comment on push event (merge to master) and dependabot PRs
     if: github.event_name != 'push' && github.actor != 'dependabot[bot]'
@@ -120,3 +134,9 @@ jobs:
     needs: test-linux
     uses: ./.github/workflows/check-docker-limit.yml
     secrets: inherit 
+
+  all-tests-passed:
+    needs: [test-linux, test-macos, test-website]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All tests have passed"
