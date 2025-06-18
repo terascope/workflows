@@ -139,4 +139,4 @@ jobs:
     needs: [test-linux, test-macos, test-website]
     runs-on: ubuntu-latest
     steps:
-      - run: echo "all tests have passed"
+      - run: echo "All tests have passed"
