@@ -44,7 +44,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /tmp/docker_cache
-          key: docker-images-${{ hashFiles('./images/image-list.txt') }}
+          key: docker-images-${{ hashFiles('./images/image-list.txt') }}-master
+          restore-keys: |
+            docker-images-${{ hashFiles('./images/image-list.txt') }}-
+            docker-images-
       - run: yarn test:all
       - name: Get Commit Short SHA
         id: get-short-sha
@@ -89,7 +92,7 @@ jobs:
       - run: ls -l build/
 
   test-website:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
