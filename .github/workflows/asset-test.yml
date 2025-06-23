@@ -91,8 +91,29 @@ jobs:
       - run: yarn dlx teraslice-cli assets build
       - run: ls -l build/
 
+  check-for-website:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    outputs:
+      website_exists: ${{ steps.find-directory.outputs.website_exists }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Find website directory
+        id: find-directory
+        run: |
+          if [ -d "./website" ]; then
+            echo "Website exists. Website build will be tested."  
+            echo "website_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Website does not exist. Website build will not be tested."  
+            echo "website_exists=false" >> $GITHUB_OUTPUT
+          fi
+
   test-website:
     runs-on: ubuntu-latest
+    needs: check-for-website
+    if: needs.check-for-website.outputs.website_exists == 'true'
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
