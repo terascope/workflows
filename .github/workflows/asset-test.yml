@@ -93,7 +93,6 @@ jobs:
 
   check-for-website:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
     outputs:
       website_exists: ${{ steps.find-directory.outputs.website_exists }}
     steps:
