@@ -122,8 +122,7 @@ jobs:
       - name: Build documentation and Check Output
         if: needs.check-for-website.outputs.website_exists == 'true'
         run: |
-          yarn && \\
-          ./scripts/build-documentation.sh && \\
+          yarn && ./scripts/build-documentation.sh && \\
           find ./website/build
 
   comment-artifact-urls:
