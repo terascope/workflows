@@ -54,7 +54,7 @@ jobs:
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in test-asset.yml
-        node-version: [22, 24]
+        node-version: [22, 24.4.1]
     steps:
       - uses: actions/checkout@v4
       
