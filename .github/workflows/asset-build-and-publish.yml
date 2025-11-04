@@ -22,9 +22,6 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-
-      - name: Install semver-compare-cli
-        run: yarn && yarn add semver-compare-cli
       
       - name: Check for asset version update
         id: version_check
@@ -34,11 +31,14 @@ jobs:
           CURRENT_VERSION=$(jq -r .version package.json)
           echo "current version:" $CURRENT_VERSION
 
-          RELEASE_VERSION=$(gh release list --exclude-drafts -L 1 --json tagName --jq '.[].tagName')
-          echo "latest (pre)release version:" $RELEASE_VERSION
+          LATEST_RELEASE_VERSION=$(gh release list --exclude-drafts -L 1 --json tagName --jq '.[].tagName')
+          echo "latest (pre)release version:" $LATEST_RELEASE_VERSION
           
-          if ./node_modules/.bin/semver-compare $CURRENT_VERSION gt $RELEASE_VERSION; then
-            echo "Asset version updated from $RELEASE_VERSION to $CURRENT_VERSION, creating release"
+          COMP_OUTPUT=$(./scripts/semver-tool.sh compare $CURRENT_VERSION $LATEST_RELEASE_VERSION)
+          echo "Semver comparison output:" $COMP_OUTPUT
+
+          if [[ "$COMP_OUTPUT" = "1" ]]; then
+            echo "Asset version updated from $LATEST_RELEASE_VERSION to $CURRENT_VERSION, creating release"
             echo "version_updated=true" >> $GITHUB_OUTPUT
             echo "tag: v$CURRENT_VERSION"
             echo "tag=v$CURRENT_VERSION" >> $GITHUB_OUTPUT

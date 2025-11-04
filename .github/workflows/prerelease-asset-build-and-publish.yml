@@ -1,7 +1,8 @@
 # NOTE: There are no tests in this publish workflow, which means it assumes that
 # the prerelease branch has been tested.  The test-asset.yml should include:
 #   push:
-#     branches: [ master ]
+#     branches: 
+#       - 'release/*-assets-v*'
 #   pull_request:
 #     branches:
 #       - 'release/*-assets-v*'
@@ -14,7 +15,7 @@ on:
 
 jobs:
   # Asset build, publish and release will only occur if the current asset version 
-  # is greater than the latest release or pre-release version
+  # is a prerelease and is greater than the latest release or pre-release version
   version-check:
     runs-on: ubuntu-latest
     outputs:
