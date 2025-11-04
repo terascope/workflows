@@ -24,9 +24,6 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-
-      - name: Install semver-compare-cli
-        run: yarn && yarn add semver-compare-cli
       
       - name: Check for asset version update
         id: version_check
@@ -128,6 +125,7 @@ jobs:
         with:
           token: ${{ steps.generate-token.outputs.token }}
           prerelease: true
+          target_commitish: ${{ github.event.pull_request.base.ref }}
           tag_name: ${{ needs.version-check.outputs.tag }}
           name: ${{ needs.version-check.outputs.tag }}
           generate_release_notes: true
