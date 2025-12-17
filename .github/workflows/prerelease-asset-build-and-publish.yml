@@ -71,8 +71,8 @@ jobs:
 
       - run: yarn && yarn setup
       - run: yarn build
-      - run: yarn dlx teraslice-cli -v
-      - run: yarn dlx teraslice-cli assets build
+      - run: yarn dlx teraslice-cli@prerelease -v
+      - run: yarn dlx teraslice-cli@prerelease assets build
       - run: ls -l ./build/
       - run: sha256sum ./build/*
 
