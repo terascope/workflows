@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
     - name: Check docker.hub pull limit
       env:
         USER: ${{ secrets.DOCKER_USERNAME }}

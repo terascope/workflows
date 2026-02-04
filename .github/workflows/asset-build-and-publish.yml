@@ -62,6 +62,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
       - run: pnpm install && pnpm run setup
       - run: pnpm build
@@ -91,6 +93,8 @@ jobs:
           # NOTE: Hard Coded Node Version
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
       - run: pnpm install && pnpm run setup
 
@@ -173,7 +177,8 @@ jobs:
         with:
           node-version:  22
           registry-url: 'https://registry.npmjs.org'
-          cache: 'pnpm'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Build documentation
         run: pnpm install && ./scripts/build-documentation.sh  # output in website/build

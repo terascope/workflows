@@ -26,6 +26,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
       # we login to docker to avoid docker pull limit rates
       # secrets are now duplicated for Actions and Dependabot
       - name: Login to Docker Hub
@@ -83,6 +85,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
       - run: pnpm install && pnpm run setup
       - run: pnpm lint
       # TODO: Ideally we'd be able to at least run unit tests that don't require docker.
@@ -119,6 +123,8 @@ jobs:
         with:
           # NOTE: Hard Coded Node Version
           node-version: '22'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
       - name: Build documentation and Check Output
         if: needs.check-for-website.outputs.website_exists == 'true'
         run: |
