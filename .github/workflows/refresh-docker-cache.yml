@@ -23,7 +23,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 22
-        cache: 'yarn'
+        cache: 'pnpm'
 
     # we login to docker to avoid docker pull limit rates
     - name: Login to Docker Hub
@@ -33,11 +33,11 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Install and build packages
-      run: yarn && yarn setup
+      run: pnpm install && pnpm run setup
 
     - name: Create Docker Image List
       run: |
-        yarn docker:listImages
+        pnpm docker:listImages
         cat ./images/image-list.txt
 
     - name: Check for Docker image cache
@@ -70,7 +70,7 @@ jobs:
         echo "Done"
 
     - name: Pull and save Docker images
-      run: yarn docker:saveImages
+      run: pnpm docker:saveImages
 
     - name: Update Docker image cache
       uses: actions/cache/save@v4

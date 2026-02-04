@@ -63,10 +63,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - run: yarn && yarn setup
-      - run: yarn build
-      - run: yarn dlx teraslice-cli -v
-      - run: yarn dlx teraslice-cli assets build
+      - run: pnpm install && pnpm run setup
+      - run: pnpm build
+      - run: pnpm dlx teraslice-cli -v
+      - run: pnpm dlx teraslice-cli assets build
       - run: ls -l ./build/
       - run: sha256sum ./build/*
 
@@ -92,7 +92,7 @@ jobs:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
-      - run: yarn && yarn setup
+      - run: pnpm install && pnpm run setup
 
       - run: ./scripts/publish.sh
         env:
@@ -173,10 +173,10 @@ jobs:
         with:
           node-version:  22
           registry-url: 'https://registry.npmjs.org'
-          cache: 'yarn'
+          cache: 'pnpm'
 
       - name: Build documentation
-        run: yarn && ./scripts/build-documentation.sh  # output in website/build
+        run: pnpm install && ./scripts/build-documentation.sh  # output in website/build
       - name: Check Output
         run: find ./website/build
       - name: Upload artifact

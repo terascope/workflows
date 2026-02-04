@@ -69,10 +69,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - run: yarn && yarn setup
-      - run: yarn build
-      - run: yarn dlx teraslice-cli@prerelease -v
-      - run: yarn dlx teraslice-cli@prerelease assets build
+      - run: pnpm install && pnpm run setup
+      - run: pnpm build
+      - run: pnpm dlx teraslice-cli@prerelease -v
+      - run: pnpm dlx teraslice-cli@prerelease assets build
       - run: ls -l ./build/
       - run: sha256sum ./build/*
 
@@ -98,7 +98,7 @@ jobs:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
-      - run: yarn && yarn setup
+      - run: pnpm install && pnpm run setup
 
       - run: ./scripts/publish.sh --tag prerelease
         env:
