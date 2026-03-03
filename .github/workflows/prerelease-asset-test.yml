@@ -26,6 +26,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
       # we login to docker to avoid docker pull limit rates
       # secrets are now duplicated for Actions and Dependabot
       - name: Login to Docker Hub
@@ -33,11 +35,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - run: yarn && yarn setup
-      - run: yarn lint
+      - run: pnpm install && pnpm run setup
+      - run: pnpm lint
       - name: Create Docker Image List
         run: |
-          yarn docker:listImages
+          pnpm docker:listImages
           cat ./images/image-list.txt
       - name: Restore Docker image cache
         id: docker-cache
@@ -48,7 +50,7 @@ jobs:
           restore-keys: |
             docker-images-${{ hashFiles('./images/image-list.txt') }}-
             docker-images-
-      - run: yarn test:all
+      - run: pnpm test:all
       - name: Get Commit Short SHA
         id: get-short-sha
         run: |
@@ -58,8 +60,8 @@ jobs:
         run: |
           jq '.version += "-dev.${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}"' asset/asset.json > tempAsset.json && mv tempAsset.json asset/asset.json
           cat asset/asset.json
-      - run: yarn dlx teraslice-cli@prerelease -v
-      - run: yarn dlx teraslice-cli@prerelease assets build
+      - run: pnpm dlx teraslice-cli@prerelease -v
+      - run: pnpm dlx teraslice-cli@prerelease assets build
       - run: ls -l build/
       - name: Archive test build artifacts
         uses: actions/upload-artifact@v4
@@ -83,12 +85,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: yarn && yarn setup
-      - run: yarn lint
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - run: pnpm install && pnpm run setup
+      - run: pnpm lint
       # TODO: Ideally we'd be able to at least run unit tests that don't require docker.
-      #- run: yarn test:all
-      - run: yarn dlx teraslice-cli@prerelease -v
-      - run: yarn dlx teraslice-cli@prerelease assets build
+      #- run: pnpm test:all
+      - run: pnpm dlx teraslice-cli@prerelease -v
+      - run: pnpm dlx teraslice-cli@prerelease assets build
       - run: ls -l build/
 
   check-for-website:
@@ -119,10 +123,12 @@ jobs:
         with:
           # NOTE: Hard Coded Node Version
           node-version: '22'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
       - name: Build documentation and Check Output
         if: needs.check-for-website.outputs.website_exists == 'true'
         run: |
-          yarn 
+          pnpm install
           ./scripts/build-documentation.sh
           find ./website/build
 
