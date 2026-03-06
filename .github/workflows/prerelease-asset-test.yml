@@ -76,7 +76,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           # NOTE: Hard Coded Node Version
-          node-version: '22'
+          node-version: '24'
       # NOTE: Prevent python 3.12 breaking node-gyp installations in the kafka asset
       # TODO: try default python again in the future 
       - name: Use Python 3.11
@@ -118,7 +118,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           # NOTE: Hard Coded Node Version
-          node-version: '22'
+          node-version: '24'
       - name: Build documentation and Check Output
         if: needs.check-for-website.outputs.website_exists == 'true'
         run: |
