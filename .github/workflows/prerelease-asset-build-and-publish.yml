@@ -98,7 +98,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           # NOTE: Hard Coded Node Version
-          node-version: '22'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
       - name: Install pnpm
         uses: pnpm/action-setup@v4
