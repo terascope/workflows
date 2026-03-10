@@ -83,9 +83,14 @@ jobs:
   asset-publish-and-release:
     needs: [version-check, asset-build]
     runs-on: ubuntu-latest
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     permissions:
       contents: write
     steps:
+
+      - name: Register npm token
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
@@ -99,8 +104,6 @@ jobs:
       - run: pnpm install && pnpm run setup
 
       - run: ./scripts/publish.sh
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Download assets from Teraslice Asset Build
         uses: actions/download-artifact@v4
