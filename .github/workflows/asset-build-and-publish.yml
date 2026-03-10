@@ -103,6 +103,11 @@ jobs:
 
       - run: pnpm install && pnpm run setup
 
+      - name: Verify pnpm authentication
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm whoami
+
       - run: ./scripts/publish.sh
 
       - name: Download assets from Teraslice Asset Build
