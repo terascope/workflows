@@ -62,11 +62,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
-      - run: yarn && yarn setup
-      - run: yarn build
-      - run: yarn dlx teraslice-cli -v
-      - run: yarn dlx teraslice-cli assets build
+      - run: pnpm install && pnpm run setup
+      - run: pnpm build
+      - run: pnpm dlx teraslice-cli -v
+      - run: pnpm dlx teraslice-cli assets build
       - run: ls -l ./build/
       - run: sha256sum ./build/*
 
@@ -91,8 +93,15 @@ jobs:
           # NOTE: Hard Coded Node Version
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
-      - run: yarn && yarn setup
+      - run: pnpm install && pnpm run setup
+
+      - name: Verify pnpm authentication
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm whoami
 
       - run: ./scripts/publish.sh
         env:
@@ -173,10 +182,11 @@ jobs:
         with:
           node-version:  22
           registry-url: 'https://registry.npmjs.org'
-          cache: 'yarn'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Build documentation
-        run: yarn && ./scripts/build-documentation.sh  # output in website/build
+        run: pnpm install && ./scripts/build-documentation.sh  # output in website/build
       - name: Check Output
         run: find ./website/build
       - name: Upload artifact
