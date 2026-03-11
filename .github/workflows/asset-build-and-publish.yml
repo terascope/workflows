@@ -16,6 +16,8 @@ jobs:
   # is greater than the latest release or pre-release version
   version-check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       version_updated: ${{ steps.version_check.outputs.version_updated}}
       tag: ${{ steps.version_check.outputs.tag}}
@@ -51,6 +53,8 @@ jobs:
     needs: [version-check]
     if: needs.version-check.outputs.version_updated == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in test-asset.yml
@@ -147,6 +151,8 @@ jobs:
   check-for-website:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
+    permissions:
+      contents: read
     outputs:
       website_exists: ${{ steps.find-directory.outputs.website_exists }}
     steps:
@@ -167,6 +173,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [version-check, check-for-website]
     if: needs.version-check.outputs.version_updated == 'true' && needs.check-for-website.outputs.website_exists == 'true'
+    permissions:
+      contents: read
     steps:
       - name: Check out code
         uses: actions/checkout@v4

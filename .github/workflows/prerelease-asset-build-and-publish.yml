@@ -18,6 +18,8 @@ jobs:
   # is a prerelease and is greater than the latest release or pre-release version
   version-check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       version_updated: ${{ steps.version_check.outputs.version_updated}}
       tag: ${{ steps.version_check.outputs.tag}}
@@ -57,6 +59,8 @@ jobs:
     needs: [version-check]
     if: needs.version-check.outputs.version_updated == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in test-asset.yml
