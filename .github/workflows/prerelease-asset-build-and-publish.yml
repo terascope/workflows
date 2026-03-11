@@ -109,7 +109,7 @@ jobs:
 
       - run: pnpm install && pnpm run setup
 
-      - run: ./scripts/publish.sh --tag prerelease
+      - run: pnpm publish -r --tag prerelease --no-git-checks
 
       - name: Download assets from Teraslice Asset Build
         uses: actions/download-artifact@v4
