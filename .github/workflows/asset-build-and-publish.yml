@@ -16,6 +16,8 @@ jobs:
   # is greater than the latest release or pre-release version
   version-check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       version_updated: ${{ steps.version_check.outputs.version_updated}}
       tag: ${{ steps.version_check.outputs.tag}}
@@ -51,6 +53,8 @@ jobs:
     needs: [version-check]
     if: needs.version-check.outputs.version_updated == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in test-asset.yml
@@ -84,6 +88,7 @@ jobs:
     needs: [version-check, asset-build]
     runs-on: ubuntu-latest
     permissions:
+      id-token: write
       contents: write
     steps:
       - uses: actions/checkout@v4
@@ -91,21 +96,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           # NOTE: Hard Coded Node Version
-          node-version: '22'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
       - run: pnpm install && pnpm run setup
 
-      - name: Verify pnpm authentication
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm whoami
-
-      - run: ./scripts/publish.sh
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: pnpm publish -r --no-git-checks
 
       - name: Download assets from Teraslice Asset Build
         uses: actions/download-artifact@v4
@@ -153,6 +151,8 @@ jobs:
   check-for-website:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
+    permissions:
+      contents: read
     outputs:
       website_exists: ${{ steps.find-directory.outputs.website_exists }}
     steps:
@@ -173,6 +173,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [version-check, check-for-website]
     if: needs.version-check.outputs.version_updated == 'true' && needs.check-for-website.outputs.website_exists == 'true'
+    permissions:
+      contents: read
     steps:
       - name: Check out code
         uses: actions/checkout@v4
