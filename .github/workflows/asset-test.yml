@@ -52,6 +52,7 @@ jobs:
             docker-images-
       - run: pnpm test:all
       - name: Get Commit Short SHA
+        if: always()
         id: get-short-sha
         run: |
           calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha || github.sha }})
@@ -69,6 +70,14 @@ jobs:
           name: teraslice-test-asset-${{ matrix.node-version }}-dev.${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}
           path: ./build
           retention-days: 7
+      - name: Upload logs artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs.commit-${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}.job-${{ github.job }}.node-${{ matrix.node-version }}
+          path: ./logs/*.log
+          retention-days: 3
+          if-no-files-found: ignore
 
   test-e2e:
     runs-on: ubuntu-latest
@@ -108,7 +117,20 @@ jobs:
             docker-images-
       - name: Install teraslice-cli
         run: npm install -g teraslice-cli
+      - name: Get Commit Short SHA
+        id: get-short-sha
+        run: |
+          calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha || github.sha }})
+          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_OUTPUT
       - run: pnpm test:e2e
+      - name: Upload logs artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs.commit-${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}.job-${{ github.job }}.node-${{ matrix.node-version }}
+          path: ./logs/*.log
+          retention-days: 3
+          if-no-files-found: ignore
 
   test-linux-encrypted:
     runs-on: ubuntu-latest
@@ -151,7 +173,20 @@ jobs:
         run: curl -Ss -JLO "https://dl.filippo.io/mkcert/v1.4.4?for=linux/amd64" && sudo chmod 777 mkcert-v1.4.4-linux-amd64 && sudo cp mkcert-v1.4.4-linux-amd64 /usr/local/bin/mkcert
       - name: Check mkcert
         run: command -v mkcert
+      - name: Get Commit Short SHA
+        id: get-short-sha
+        run: |
+          calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha || github.sha }})
+          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_OUTPUT
       - run: pnpm test:encrypted
+      - name: Upload logs artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs.commit-${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}.job-${{ github.job }}.node-${{ matrix.node-version }}
+          path: ./logs/*.log
+          retention-days: 3
+          if-no-files-found: ignore
 
   test-macos:
     runs-on: macos-latest
