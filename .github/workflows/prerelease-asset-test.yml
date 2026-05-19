@@ -50,13 +50,12 @@ jobs:
           restore-keys: |
             docker-images-${{ hashFiles('./images/image-list.txt') }}-
             docker-images-
-      - run: pnpm test:all
       - name: Get Commit Short SHA
-        if: success() || failure()
         id: get-short-sha
         run: |
           calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha || github.sha }})
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_OUTPUT
+      - run: pnpm test:all
       - name: Append dev tag to version
         run: |
           jq '.version += "-dev.${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}"' asset/asset.json > tempAsset.json && mv tempAsset.json asset/asset.json
