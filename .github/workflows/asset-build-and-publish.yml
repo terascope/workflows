@@ -23,7 +23,7 @@ jobs:
       tag: ${{ steps.version_check.outputs.tag}}
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       
       - name: Check for asset version update
         id: version_check
@@ -60,14 +60,14 @@ jobs:
         # NOTE: Hard Coded Node Version array, should match array in test-asset.yml
         node-version: [22, 24]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - run: pnpm install && pnpm run setup
       - run: pnpm build
@@ -77,7 +77,7 @@ jobs:
       - run: sha256sum ./build/*
 
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: teraslice-asset-${{ matrix.node-version }}
           path: ./build
@@ -91,22 +91,22 @@ jobs:
       id-token: write
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           # NOTE: Hard Coded Node Version
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - run: pnpm install && pnpm run setup
 
       - run: pnpm publish -r --no-git-checks
 
       - name: Download assets from Teraslice Asset Build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: ./build/
           pattern: teraslice-asset-*
@@ -116,13 +116,13 @@ jobs:
 
       - name: Generate a token
         id: generate-token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ vars.RELEASES_APP_ID }}
           private-key: ${{ secrets.RELEASES_PRIVATE_KEY }}
 
       - name: Create Release With Assets
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           token: ${{ steps.generate-token.outputs.token }}
           prerelease: true
@@ -133,7 +133,7 @@ jobs:
 
       - name: Announce release in Slack releases channel
         id: announce-release
-        uses: slackapi/slack-github-action@v2.0.0
+        uses: slackapi/slack-github-action@v3.0.3
         with:
           method: chat.postMessage
           token: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -157,7 +157,7 @@ jobs:
       website_exists: ${{ steps.find-directory.outputs.website_exists }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Find website directory
         id: find-directory
         run: |
@@ -177,22 +177,22 @@ jobs:
       contents: read
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version:  22
           registry-url: 'https://registry.npmjs.org'
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Build documentation
         run: pnpm install && ./scripts/build-documentation.sh  # output in website/build
       - name: Check Output
         run: find ./website/build
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./website/build
 
@@ -206,4 +206,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

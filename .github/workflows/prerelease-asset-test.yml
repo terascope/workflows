@@ -21,17 +21,17 @@ jobs:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
         node-version: [22, 24]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
       # we login to docker to avoid docker pull limit rates
       # secrets are now duplicated for Actions and Dependabot
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -43,7 +43,7 @@ jobs:
           cat ./images/image-list.txt
       - name: Restore Docker image cache
         id: docker-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /tmp/docker_cache
           key: docker-images-${{ hashFiles('./images/image-list.txt') }}-master
@@ -64,14 +64,14 @@ jobs:
       - run: pnpm dlx teraslice-cli@prerelease assets build
       - run: ls -l build/
       - name: Archive test build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: teraslice-test-asset-${{ matrix.node-version }}-dev.${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}
           path: ./build
           retention-days: 7
       - name: Upload logs artifact
         if: success() || failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: logs.commit-${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}.job-${{ github.job }}.node-${{ matrix.node-version }}
           path: ./logs/*.log
@@ -86,17 +86,17 @@ jobs:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
         node-version: [22, 24]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
       # we login to docker to avoid docker pull limit rates
       # secrets are now duplicated for Actions and Dependabot
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -107,7 +107,7 @@ jobs:
           cat ./images/image-list.txt
       - name: Restore Docker image cache
         id: docker-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /tmp/docker_cache
           key: docker-images-${{ hashFiles('./images/image-list.txt') }}-master
@@ -124,7 +124,7 @@ jobs:
       - run: pnpm test:e2e
       - name: Upload logs artifact
         if: success() || failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: logs.commit-${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}.job-${{ github.job }}.node-${{ matrix.node-version }}
           path: ./logs/*.log
@@ -139,17 +139,17 @@ jobs:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
         node-version: [22, 24]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
       # we login to docker to avoid docker pull limit rates
       # secrets are now duplicated for Actions and Dependabot
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -161,7 +161,7 @@ jobs:
           cat ./images/image-list.txt
       - name: Restore Docker image cache
         id: docker-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /tmp/docker_cache
           key: docker-images-${{ hashFiles('./images/image-list.txt') }}-master
@@ -180,7 +180,7 @@ jobs:
       - run: pnpm test:encrypted
       - name: Upload logs artifact
         if: success() || failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: logs.commit-${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}.job-${{ github.job }}.node-${{ matrix.node-version }}
           path: ./logs/*.log
@@ -190,20 +190,14 @@ jobs:
   test-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           # NOTE: Hard Coded Node Version
           node-version: '24'
-      # NOTE: Prevent python 3.12 breaking node-gyp installations in the kafka asset
-      # TODO: try default python again in the future 
-      - name: Use Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
       - run: pnpm install && pnpm run setup
       - run: pnpm lint
       # TODO: Ideally we'd be able to at least run unit tests that don't require docker.
@@ -218,7 +212,7 @@ jobs:
       website_exists: ${{ steps.find-directory.outputs.website_exists }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Find website directory
         id: find-directory
         run: |
@@ -234,14 +228,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: check-for-website
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           # NOTE: Hard Coded Node Version
           node-version: '24'
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
       - name: Build documentation and Check Output
         if: needs.check-for-website.outputs.website_exists == 'true'
         run: |
