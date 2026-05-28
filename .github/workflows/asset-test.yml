@@ -2,16 +2,25 @@ name: Test Teraslice Asset
 run-name: ${{ github.actor }} is testing the Teraslice Asset
 on:
   workflow_call:
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
 
 jobs:
   check-docker-limit-before:
     uses: ./.github/workflows/check-docker-limit.yml
-    secrets: inherit 
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   cache-docker-images:
     needs: check-docker-limit-before
     uses: ./.github/workflows/cache-docker-images.yml
-    secrets: inherit
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   test-linux:
     runs-on: ubuntu-latest
@@ -274,7 +283,9 @@ jobs:
   check-docker-limit-after:
     needs: test-linux
     uses: ./.github/workflows/check-docker-limit.yml
-    secrets: inherit 
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   all-tests-passed:
     needs: [test-linux, test-linux-encrypted, test-e2e, test-macos, test-website]

@@ -10,6 +10,11 @@ name: Build, Publish and Release Teraslice Asset
 run-name: ${{ github.actor }} is building, publishing, and releasing the Teraslice Asset
 on:
   workflow_call:
+    secrets:
+      RELEASES_PRIVATE_KEY:
+        required: true
+      SLACK_BOT_TOKEN:
+        required: true
 
 jobs:
   # Asset build will occur if any versions are updated

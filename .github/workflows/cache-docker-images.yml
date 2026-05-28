@@ -2,6 +2,11 @@ name: Cache Docker Images If No Cache Found
 
 on:
   workflow_call:
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
 
 jobs:
   cache-docker-images:

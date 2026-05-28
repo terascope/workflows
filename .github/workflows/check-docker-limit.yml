@@ -2,6 +2,11 @@ name: Check Docker Pull Rate Limit
 
 on:
   workflow_call:
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
 
 jobs:
   check-docker-pull-rate-limit:
