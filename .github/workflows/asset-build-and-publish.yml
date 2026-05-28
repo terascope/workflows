@@ -32,6 +32,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
@@ -98,6 +100,8 @@ jobs:
         node-version: [22, 24]
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
@@ -128,6 +132,8 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v6
         with:
@@ -213,6 +219,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Find website directory
         id: find-directory
         run: |
@@ -233,6 +241,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v6

@@ -31,6 +31,8 @@ jobs:
         node-version: [22, 24]
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
@@ -100,6 +102,8 @@ jobs:
         node-version: [22, 24]
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
@@ -155,6 +159,8 @@ jobs:
         node-version: [22, 24]
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
@@ -208,6 +214,8 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Use Node.js
         uses: actions/setup-node@v6
         with:
@@ -230,6 +238,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Find website directory
         id: find-directory
         run: |
@@ -246,6 +256,8 @@ jobs:
     needs: check-for-website
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Use Node.js
         uses: actions/setup-node@v6
         with:
