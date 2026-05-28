@@ -16,6 +16,8 @@ on:
       SLACK_BOT_TOKEN:
         required: true
 
+permissions: {}
+
 jobs:
   # Asset build will occur if any versions are updated
   # NPM publish will occur if a public sub-package version has updated

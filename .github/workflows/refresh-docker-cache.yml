@@ -8,8 +8,12 @@ on:
       DOCKER_PASSWORD:
         required: true
 
+permissions: {}
+
 jobs:
   Check-docker-limit-before:
+    permissions:
+      contents: read
     uses: ./.github/workflows/check-docker-limit.yml
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -18,6 +22,9 @@ jobs:
   refresh-docker-cache:
     runs-on: ubuntu-latest
     needs: Check-docker-limit-before
+    permissions:
+      contents: read
+      actions: write
 
     # # final check to make sure it runs only on master branch
     if: github.ref == 'refs/heads/master'
@@ -92,6 +99,8 @@ jobs:
 
   Check-docker-limit-after:
     needs: refresh-docker-cache
+    permissions:
+      contents: read
     uses: ./.github/workflows/check-docker-limit.yml
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}

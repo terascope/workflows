@@ -3,6 +3,8 @@ name: Check Github API Rate limit
 on:
   workflow_call:
 
+permissions: {}
+
 jobs:
   check-github-api-rate-limit:
     runs-on: ubuntu-latest

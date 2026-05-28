@@ -3,9 +3,14 @@ name: Refresh Asset Bundles Cache
 on:
   workflow_call:
 
+permissions: {}
+
 jobs:
   refresh-asset-bundle-cache:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
 
     # # final check to make sure it runs only on master branch
     if: github.ref == 'refs/heads/master'

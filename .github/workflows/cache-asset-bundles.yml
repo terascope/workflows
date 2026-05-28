@@ -3,9 +3,13 @@ name: Cache Asset Bundles If No Cache Found
 on:
   workflow_call:
 
+permissions: {}
+
 jobs:
   cache-asset-bundles:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
     - name: Check out code
       uses: actions/checkout@v6
