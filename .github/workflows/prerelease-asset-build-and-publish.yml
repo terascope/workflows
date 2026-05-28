@@ -204,4 +204,6 @@ jobs:
   
       - name: Failed Announcement Response
         if: ${{ steps.announce-release.outputs.ok == 'false' }}
-        run: echo "Slackbot API failure response - ${{ steps.announce-release.outputs.response }}"
+        env:
+          SLACK_RESPONSE: ${{ steps.announce-release.outputs.response }}
+        run: echo "Slackbot API failure response - $SLACK_RESPONSE"

@@ -61,13 +61,17 @@ jobs:
             docker-images-
       - name: Get Commit Short SHA
         id: get-short-sha
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha || github.sha }})
+          calculatedSha=$(git rev-parse --short "$HEAD_SHA")
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_OUTPUT
       - run: pnpm test:all
       - name: Append dev tag to version
+        env:
+          COMMIT_SHORT_SHA: ${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}
         run: |
-          jq '.version += "-dev.${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}"' asset/asset.json > tempAsset.json && mv tempAsset.json asset/asset.json
+          jq --arg sha "$COMMIT_SHORT_SHA" '.version += "-dev." + $sha' asset/asset.json > tempAsset.json && mv tempAsset.json asset/asset.json
           cat asset/asset.json
       - run: pnpm dlx teraslice-cli -v
       - run: pnpm dlx teraslice-cli assets build
@@ -127,8 +131,10 @@ jobs:
         run: npm install -g teraslice-cli
       - name: Get Commit Short SHA
         id: get-short-sha
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha || github.sha }})
+          calculatedSha=$(git rev-parse --short "$HEAD_SHA")
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_OUTPUT
       - run: pnpm test:e2e
       - name: Upload logs artifact
@@ -183,8 +189,10 @@ jobs:
         run: command -v mkcert
       - name: Get Commit Short SHA
         id: get-short-sha
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha || github.sha }})
+          calculatedSha=$(git rev-parse --short "$HEAD_SHA")
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_OUTPUT
       - run: pnpm test:encrypted
       - name: Upload logs artifact
@@ -262,22 +270,26 @@ jobs:
         id: artifacts-list
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
         run: |
-          ARTIFACTS_JSON=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)
+          ARTIFACTS_JSON=$(gh api repos/$REPO/actions/runs/$RUN_ID/artifacts)
           echo $ARTIFACTS_JSON
           ID_LIST=$(echo "$ARTIFACTS_JSON" | jq -c  '[.artifacts[] | {name: .name, id:.id}]')
           echo $ID_LIST
           echo "artifact-ids=$ID_LIST" >> "$GITHUB_OUTPUT"
-          
+
       - name: Comment on PR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
         run: |
           ARTIFACT_IDS='${{ steps.artifacts-list.outputs.artifact-ids }}'
-          LIST=$(echo "$ARTIFACT_IDS" | jq -r '.[] | "\(.name): https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/\(.id)"')
+          LIST=$(echo "$ARTIFACT_IDS" | jq -r ".[] | \"\(.name): https://github.com/$REPO/actions/runs/$RUN_ID/artifacts/\(.id)\"")
           COMMENT=$(printf "Asset artifacts:\n%s" "$LIST")
-          gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments -f body="$COMMENT"
+          gh api repos/$REPO/issues/$PR_NUMBER/comments -f body="$COMMENT"
 
 
   check-docker-limit-after:
