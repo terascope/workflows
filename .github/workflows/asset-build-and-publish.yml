@@ -27,6 +27,11 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - run: pnpm install && pnpm run setup
       
       - name: Check for asset version update
         id: asset_version_check
