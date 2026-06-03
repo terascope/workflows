@@ -318,11 +318,11 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
           RUN_ID: ${{ github.run_id }}
+          ARTIFACT_IDS: ${{ steps.artifacts-list.outputs.artifact-ids }}
         run: |
-          ARTIFACT_IDS='${{ steps.artifacts-list.outputs.artifact-ids }}'
           LIST=$(echo "$ARTIFACT_IDS" | jq -r ".[] | \"\(.name): https://github.com/$REPO/actions/runs/$RUN_ID/artifacts/\(.id)\"")
           COMMENT=$(printf "Asset artifacts:\n%s" "$LIST")
-          gh api repos/$REPO/issues/$PR_NUMBER/comments -f body="$COMMENT"
+          gh api "repos/$REPO/issues/$PR_NUMBER/comments" -f body="$COMMENT"
 
 
   check-docker-limit-after:
@@ -337,5 +337,6 @@ jobs:
   all-tests-passed:
     needs: [test-linux, test-linux-encrypted, test-e2e, test-macos, test-website]
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - run: echo "All tests have passed"

@@ -215,4 +215,6 @@ jobs:
         if: ${{ steps.announce-release.outputs.ok == 'false' }}
         env:
           SLACK_RESPONSE: ${{ steps.announce-release.outputs.response }}
-        run: echo "Slackbot API failure response - $SLACK_RESPONSE"
+        run: |
+          echo "::add-mask::$SLACK_RESPONSE"
+          echo "Slackbot API failure response - $SLACK_RESPONSE"

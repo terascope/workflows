@@ -8,6 +8,7 @@ permissions: {}
 jobs:
   check-github-api-rate-limit:
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
     - name: Check Github API rate limit Unauthorized
       run: curl -Ss https://api.github.com/rate_limit
