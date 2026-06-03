@@ -293,11 +293,12 @@ jobs:
   comment-artifact-urls:
     # skip comment on push event (merge to master) and dependabot PRs
     if: github.event_name != 'push' && github.actor != 'dependabot[bot]'
-    needs: [test-linux, test-macos]
+    needs: [test-linux, test-macos, test-linux-encrypted, test-e2e]
     runs-on: ubuntu-latest
     permissions:
       actions: read
       issues: write
+      pull-requests: write
     steps:
       - name: Get Artifacts List
         id: artifacts-list
@@ -326,7 +327,7 @@ jobs:
 
 
   check-docker-limit-after:
-    needs: test-linux
+    needs: [test-linux, test-linux-encrypted, test-e2e]
     permissions:
       contents: read
     uses: ./.github/workflows/check-docker-limit.yml
