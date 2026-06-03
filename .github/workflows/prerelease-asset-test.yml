@@ -297,7 +297,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: read
-      issues: write
       pull-requests: write
     steps:
       - name: Get Artifacts List
