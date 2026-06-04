@@ -1,4 +1,4 @@
-name: Test Teraslice Asset
+name: Test Teraslice Prerelease Asset
 run-name: ${{ github.actor }} is testing the Teraslice Prerelease Asset
 on:
   workflow_call:
