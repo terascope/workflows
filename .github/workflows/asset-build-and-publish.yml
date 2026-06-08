@@ -1,15 +1,23 @@
 # NOTE: There are no tests in this publish workflow, which means it assumes that
-# the master branch has been tested.  The test-asset.yml should include:
+# the branch has been tested.  The test-asset.yml should include:
 #   push:
-#     branches: [ master ]
+#     branches:
+#       - master
+#       - 'release/*-assets-v*'
 #   pull_request:
-#     branches: [ master ]
-# which is meant to test on PRs to master and push to master.
+#     branches:
+#       - master
+#       - 'release/*-assets-v*'
+# which is meant to test on PRs and pushes to master and release branches.
 
 name: Build, Publish and Release Teraslice Asset
 run-name: ${{ github.actor }} is building, publishing, and releasing the Teraslice Asset
 on:
   workflow_call:
+    inputs:
+      teraslice-cli-version:
+        required: true
+        type: string
     secrets:
       RELEASES_PRIVATE_KEY:
         required: true
@@ -19,11 +27,25 @@ on:
 permissions: {}
 
 jobs:
+  validate-inputs:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Validate teraslice-cli-version
+        env:
+          TERASLICE_CLI_VERSION: ${{ inputs.teraslice-cli-version }}
+        run: |
+          if [[ "$TERASLICE_CLI_VERSION" != "latest" && "$TERASLICE_CLI_VERSION" != "prerelease" ]]; then
+            echo "Invalid teraslice-cli-version: '$TERASLICE_CLI_VERSION'. Must be 'latest' or 'prerelease'."
+            exit 1
+          fi
+
   # Asset build will occur if any versions are updated
   # NPM publish will occur if a public sub-package version has updated
-  # Asset release will occur if the current asset version 
+  # Asset release will occur if the current asset version
   # is greater than the latest release or pre-release version
   version-check:
+    needs: validate-inputs
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -46,17 +68,24 @@ jobs:
         id: asset_version_check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TERASLICE_CLI_VERSION: ${{ inputs.teraslice-cli-version }}
         run: |
           CURRENT_VERSION=$(jq -r .version package.json)
           echo "current version:" $CURRENT_VERSION
 
           LATEST_RELEASE_VERSION=$(gh release list --exclude-drafts -L 1 --json tagName --jq '.[].tagName')
           echo "latest (pre)release version:" $LATEST_RELEASE_VERSION
-          
+
           COMP_OUTPUT=$(./scripts/semver-tool.sh compare $CURRENT_VERSION $LATEST_RELEASE_VERSION)
           echo "Semver comparison output:" $COMP_OUTPUT
 
-          if [[ "$COMP_OUTPUT" = "1" ]]; then
+          PRERELEASE_TAG=$(./scripts/semver-tool.sh get prerelease $CURRENT_VERSION)
+          IS_PRE_RELEASE=$([ -n "$PRERELEASE_TAG" ] && echo true || echo false)
+          echo "is_pre_release=$IS_PRE_RELEASE"
+
+          EXPECTED_PRERELEASE=$([[ "$TERASLICE_CLI_VERSION" = "prerelease" ]] && echo true || echo false)
+
+          if [[ "$COMP_OUTPUT" = "1" && "$IS_PRE_RELEASE" = "$EXPECTED_PRERELEASE" ]]; then
             echo "Asset version updated from $LATEST_RELEASE_VERSION to $CURRENT_VERSION, creating release"
             echo "asset_version_updated=true" >> $GITHUB_OUTPUT
             echo "tag: v$CURRENT_VERSION"
@@ -70,8 +99,9 @@ jobs:
         id: package_version_check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TERASLICE_CLI_VERSION: ${{ inputs.teraslice-cli-version }}
         run: |
-          pnpm publish -r --dry-run --report-summary
+          pnpm publish -r --tag "$TERASLICE_CLI_VERSION" --dry-run --report-summary
 
           if [ ! -f pnpm-publish-summary.json ]; then
             echo "No publish summary found, skipping"
@@ -114,8 +144,14 @@ jobs:
 
       - run: pnpm install && pnpm run setup
       - run: pnpm build
-      - run: pnpm dlx teraslice-cli -v
-      - run: pnpm dlx teraslice-cli assets build
+      - name: Check teraslice-cli version
+        env:
+          TERASLICE_CLI_VERSION: ${{ inputs.teraslice-cli-version }}
+        run: pnpm dlx "teraslice-cli@$TERASLICE_CLI_VERSION" -v
+      - name: Build asset
+        env:
+          TERASLICE_CLI_VERSION: ${{ inputs.teraslice-cli-version }}
+        run: pnpm dlx "teraslice-cli@$TERASLICE_CLI_VERSION" assets build
       - run: ls -l ./build/
       - run: sha256sum ./build/*
 
@@ -147,7 +183,10 @@ jobs:
 
       - run: pnpm install && pnpm run setup
 
-      - run: pnpm publish -r --no-git-checks
+      - name: Publish
+        env:
+          TERASLICE_CLI_VERSION: ${{ inputs.teraslice-cli-version }}
+        run: pnpm publish -r --tag "$TERASLICE_CLI_VERSION" --no-git-checks
 
   # Asset Release should be done only after builds from all Node versions have completed.
   asset-release:
@@ -189,6 +228,7 @@ jobs:
         with:
           token: ${{ steps.generate-token.outputs.token }}
           prerelease: true
+          target_commitish: ${{ github.event.pull_request.base.ref }}
           tag_name: ${{ needs.version-check.outputs.tag }}
           name: ${{ needs.version-check.outputs.tag }}
           generate_release_notes: true
@@ -217,7 +257,8 @@ jobs:
 
   check-for-website:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
+    needs: validate-inputs
+    if: github.event.pull_request.merged == true && inputs.teraslice-cli-version == 'latest'
     permissions:
       contents: read
     outputs:
@@ -253,7 +294,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
-          node-version:  22
+          node-version:  24
           registry-url: 'https://registry.npmjs.org'
       - name: Install pnpm
         uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
