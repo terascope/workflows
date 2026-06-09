@@ -3,18 +3,16 @@ name: Check Github API Rate limit
 on:
   workflow_call:
 
+permissions: {}
+
 jobs:
   check-github-api-rate-limit:
     runs-on: ubuntu-latest
-    env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions: {}
     steps:
     - name: Check Github API rate limit Unauthorized
       run: curl -Ss https://api.github.com/rate_limit
     - name: Check Github API rate limit Authorized
-      run: |
-        curl -Ss -L \
-        -H "Accept: application/vnd.github+json" \
-        -H "Authorization: Bearer $GITHUB_TOKEN" \
-        -H "X-GitHub-Api-Version: 2022-11-28" \
-        https://api.github.com/rate_limit
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: gh api /rate_limit
