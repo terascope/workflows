@@ -7,6 +7,13 @@ on:
         required: true
       DOCKER_PASSWORD:
         required: true
+    inputs:
+      KIND_VERSION:
+        type: string
+        required: false
+      K8S_VERSION:
+        type: string
+        required: false
 
 permissions: {}
 
@@ -42,6 +49,9 @@ jobs:
 
     - name: Create Docker Image List
       id: image-list
+      env:
+        KIND_VERSION: ${{ inputs.KIND_VERSION }}
+        K8S_VERSION: ${{ inputs.K8S_VERSION }}
       run: |
         pnpm docker:listImages
         cat ./images/image-list.txt
