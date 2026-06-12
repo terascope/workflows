@@ -101,7 +101,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERASLICE_CLI_VERSION: ${{ inputs.teraslice-cli-version }}
         run: |
-          pnpm publish -r --tag "$TERASLICE_CLI_VERSION" --dry-run --report-summary
+          pnpm publish -r --tag "$TERASLICE_CLI_VERSION" --dry-run --no-provenance --report-summary
 
           if [ ! -f pnpm-publish-summary.json ]; then
             echo "No publish summary found, skipping"
