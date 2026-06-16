@@ -325,7 +325,7 @@ jobs:
           find ./website/build
 
   comment-artifact-urls:
-    # skip comment on push event (merge to master) and dependabot PRs
+    # skip comment on push event (merge to master/main) and dependabot PRs
     if: github.event_name != 'push' && github.actor != 'dependabot[bot]'
     needs: [test-linux, test-macos, test-linux-encrypted, test-e2e]
     runs-on: ubuntu-latest

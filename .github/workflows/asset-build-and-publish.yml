@@ -2,13 +2,13 @@
 # the branch has been tested.  The test-asset.yml should include:
 #   push:
 #     branches:
-#       - master
+#       - master/main
 #       - 'release/*-assets-v*'
 #   pull_request:
 #     branches:
-#       - master
+#       - master/main
 #       - 'release/*-assets-v*'
-# which is meant to test on PRs and pushes to master and release branches.
+# which is meant to test on PRs and pushes to master/main and release branches.
 
 name: Build, Publish and Release Teraslice Asset
 run-name: ${{ github.actor }} is building, publishing, and releasing the Teraslice Asset
