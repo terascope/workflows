@@ -144,14 +144,14 @@ jobs:
 
       - run: pnpm install && pnpm run setup
       - run: pnpm build
+      - name: Install teraslice-cli
+        env:
+            TERASLICE_CLI_VERSION: ${{ inputs.teraslice-cli-version }}
+        run: npm install -g "teraslice-cli@$TERASLICE_CLI_VERSION"
       - name: Check teraslice-cli version
-        env:
-          TERASLICE_CLI_VERSION: ${{ inputs.teraslice-cli-version }}
-        run: pnpm dlx "teraslice-cli@$TERASLICE_CLI_VERSION" -v
+        run: teraslice-cli -v
       - name: Build asset
-        env:
-          TERASLICE_CLI_VERSION: ${{ inputs.teraslice-cli-version }}
-        run: pnpm dlx "teraslice-cli@$TERASLICE_CLI_VERSION" assets build
+        run: teraslice-cli assets build
       - run: ls -l ./build/
       - run: sha256sum ./build/*
 
